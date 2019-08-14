@@ -1,0 +1,23 @@
+﻿<Window x:Class="HexChanger.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:HexChanger"
+        mc:Ignorable="d"
+        Title="Hex changer" Height="450" Width="800">
+    <Grid>
+        <Menu HorizontalAlignment="Left" Height="auto" VerticalAlignment="Top" Width="800">
+            <Button Content="Otwórz plik" Width="100" Click="LoadFile"/>
+            <Button Content="Wczytaj instrukcje" Width="100" Click="LoadInstruction"/>
+            <Button Content="Napraw" Width="100" Click="Fix"/>
+            <Button Content="Zapisz" Width="100" Click="SaveFile"/>
+        </Menu>
+        <ScrollViewer HorizontalAlignment="Left" Margin="10,30,0,0" Width="380">
+            <TextBlock TextWrapping="Wrap" Name="Loaded" Text="Wczytany plik" VerticalAlignment="Top" FontFamily="Courier New"/>
+        </ScrollViewer>
+        <ScrollViewer HorizontalAlignment="Right" Margin="0,30,10,0" Width="380">
+            <TextBlock TextWrapping="Wrap" Name="Fixed" Text="Naprawiony plik" VerticalAlignment="Top" FontFamily="Courier New"/>
+        </ScrollViewer>
+    </Grid>
+</Window>
