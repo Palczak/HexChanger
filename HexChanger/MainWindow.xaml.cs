@@ -52,10 +52,10 @@ namespace HexChanger
 
         public void LoadInstruction(object sender, RoutedEventArgs e)
         {
-            
+
             try
             {
-            
+
                 OpenFileDialog openFileDialog = new OpenFileDialog
                 {
                     DefaultExt = ".bin",
@@ -75,13 +75,13 @@ namespace HexChanger
                         PrintAndFix();
                     }
                 }
-                
+
             }
             catch (Exception exception)
             {
                 MessageBox.Show(exception.Message);
             }
-            
+
         }
 
         public void Fix(object sender, RoutedEventArgs e)
@@ -100,7 +100,19 @@ namespace HexChanger
         {
             try
             {
+                if (!_globalManager.Identify())
+                {
+                    if (MessageBox.Show("Brak dopasowania pliku identyfikacyjnego z plikiem uszkodzonym. Wykonać instrukcje mimo to?", "Brak dopasowania", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.No)
+                    {
+                        throw new Exception("Plik identyfikacyjy oraz plik uszkodzony nie zostały dopasowane.");
+                    }
+                }
+
                 var positionsFound = _globalManager.Find();
+                if (positionsFound == null)
+                {
+                    throw new Exception("Nie znaleziono uszkodzonych segmentóws.");
+                }
 
                 if (positionsFound != null)
                 {
@@ -108,17 +120,17 @@ namespace HexChanger
                     bool isConflict = false;
                     foreach (var position in positionsFound)
                     {
-                        if(position.Value.Count > 1)
+                        if (position.Value.Count > 1)
                         {
                             isConflict = true;
                             break;
                         }
                     }
-                    if(isConflict)
+                    if (isConflict)
                     {
                         ConflictDialog dialog = new ConflictDialog(positionsFound);
                         dialog.ShowDialog();
-                        if(dialog.SolvedConflicts != null)
+                        if (dialog.SolvedConflicts != null)
                         {
                             positionsFound = dialog.SolvedConflicts;
                         }

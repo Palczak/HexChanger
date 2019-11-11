@@ -28,31 +28,31 @@ namespace Managers
 
         public Hex Fix(Dictionary<int, List<int>> positionsFound)
         {
-
             FixManager.Fix(positionsFound);
             return FixManager.FixedHex;
-
         }
+
+        public bool Identify()
+        {
+            if(FixManager.IsSet())
+            {
+                return FixManager.Identify();
+            }
+            return false;
+        } 
 
         public Dictionary<int, List<int>> Find()
         {
             if (FixManager.IsSet())
             {
-                if (!FixManager.Identify())
+                var positionsFound = FixManager.Find();
+                if (positionsFound.Count == 0)
                 {
-                    throw new Exception("Plik identyfikacyjny i uszkodzony nie zostały dopasowane.");
+                    return null;
                 }
                 else
                 {
-                    var positionsFound = FixManager.Find();
-                    if (positionsFound.Count == 0)
-                    {
-                        throw new Exception("Żadna instrukcja szukająca nie została dopasowana.");
-                    }
-                    else
-                    {
-                        return positionsFound;
-                    }
+                    return positionsFound;
                 }
             }
             return null;
