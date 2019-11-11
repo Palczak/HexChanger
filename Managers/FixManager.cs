@@ -95,7 +95,7 @@ namespace Managers
             //index  - lenght
             FixedHex.Replace(startIndex - instruction.BeforeHex.Count, instruction.BeforeHex);
             FixedHex.Replace(startIndex, instruction.InsideHex);
-            FixedHex.Replace(startIndex + instruction.AfterHex.Count, instruction.AfterHex);
+            FixedHex.Replace(startIndex + instruction.InsideHex.Count, instruction.AfterHex);
         }
     }
 }
