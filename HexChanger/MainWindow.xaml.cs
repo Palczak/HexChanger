@@ -4,6 +4,7 @@ using Microsoft.Win32;
 using System;
 using System.IO;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace HexChanger
 {
@@ -24,7 +25,6 @@ namespace HexChanger
         {
             try
             {
-
                 OpenFileDialog openFileDialog = new OpenFileDialog
                 {
                     DefaultExt = ".bin",
@@ -52,10 +52,8 @@ namespace HexChanger
 
         public void LoadInstruction(object sender, RoutedEventArgs e)
         {
-
             try
             {
-
                 OpenFileDialog openFileDialog = new OpenFileDialog
                 {
                     DefaultExt = ".bin",
@@ -75,13 +73,11 @@ namespace HexChanger
                         PrintAndFix();
                     }
                 }
-
             }
             catch (Exception exception)
             {
                 MessageBox.Show(exception.Message);
             }
-
         }
 
         public void Fix(object sender, RoutedEventArgs e)
@@ -170,6 +166,23 @@ namespace HexChanger
             catch (Exception exception)
             {
                 MessageBox.Show(exception.Message);
+            }
+        }
+
+        private void ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            if ((bool)SynchScrolls.IsChecked)
+            {
+                if (sender == FixedScroll)
+                {
+                    CorruptedScroll.ScrollToVerticalOffset(e.VerticalOffset);
+                    CorruptedScroll.ScrollToHorizontalOffset(e.HorizontalOffset);
+                }
+                else
+                {
+                    FixedScroll.ScrollToVerticalOffset(e.VerticalOffset);
+                    FixedScroll.ScrollToHorizontalOffset(e.HorizontalOffset);
+                }
             }
         }
     }
