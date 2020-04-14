@@ -5,7 +5,8 @@ using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
+using System.Windows.Documents;
+using System.Windows.Media;
 
 namespace HexChanger
 {
@@ -20,6 +21,7 @@ namespace HexChanger
         {
             _globalManager = new GlobalManager();
             InitializeComponent();
+            PrintHexes();
         }
 
         public void LoadFile(object sender, RoutedEventArgs e)
@@ -188,22 +190,75 @@ namespace HexChanger
 
         private void PrintHexes()
         {
-            if(!_globalManager.FixManager.CorruptedHex.IsEmpty)
+            FlowDocument hexDocument;
+
+            if (_globalManager.FixManager.CorruptedHex.IsEmpty)
             {
-                CorruptedText.Text = _globalManager.FixManager.CorruptedHex.ToString();
+                hexDocument = new FlowDocument();
+                hexDocument.Blocks.Add(new Paragraph(new Run("Wczytany plik")));
+                CorruptedText.Document = hexDocument;
             }
-            else
+            else if ((!_globalManager.FixManager.CorruptedHex.IsEmpty) && _globalManager.FixManager.FixedHex.IsEmpty)
             {
-                CorruptedText.Text = "Wczytany plik";
+                hexDocument = new FlowDocument();
+                hexDocument.Blocks.Add(new Paragraph(new Run(_globalManager.FixManager.CorruptedHex.ToString())));
+                CorruptedText.Document = hexDocument;
             }
 
-            if (!_globalManager.FixManager.FixedHex.IsEmpty)
+            if (_globalManager.FixManager.FixedHex.IsEmpty)
             {
-                FixedText.Text = _globalManager.FixManager.FixedHex.ToString();
+                hexDocument = new FlowDocument();
+                hexDocument.Blocks.Add(new Paragraph(new Run("Naprawiony plik")));
+                FixedText.Document = hexDocument;
             }
-            else
+            else if ((!_globalManager.FixManager.FixedHex.IsEmpty) && _globalManager.FixManager.CorruptedHex.IsEmpty)
             {
-                FixedText.Text = "Naprawiony plik";
+                hexDocument = new FlowDocument();
+                hexDocument.Blocks.Add(new Paragraph(new Run(_globalManager.FixManager.FixedHex.ToString())));
+                FixedText.Document = hexDocument;
+            }
+
+            if (!_globalManager.FixManager.CorruptedHex.IsEmpty && !_globalManager.FixManager.FixedHex.IsEmpty)
+            {
+                hexDocument = new FlowDocument();
+                var hexParagraph = new Paragraph();
+                int i = 0;
+                foreach (var corruptedByte in _globalManager.FixManager.CorruptedHex)
+                {
+                    if (i != 0 && i % 16 == 0)
+                    {
+                        hexDocument.Blocks.Add(hexParagraph);
+                        hexParagraph = new Paragraph();
+                    }
+                    var hexByte = new Run(corruptedByte.ToString("X2") + " ");
+                    if (corruptedByte != _globalManager.FixManager.FixedHex[i])
+                    {
+                        hexByte.Background = Brushes.Orange;
+                    }
+                    hexParagraph.Inlines.Add(hexByte);
+                    i++;
+                }
+                CorruptedText.Document = hexDocument;
+
+                hexDocument = new FlowDocument();
+                hexParagraph = new Paragraph();
+                i = 0;
+                foreach (var fixedByte in _globalManager.FixManager.FixedHex)
+                {
+                    if (i != 0 && i % 16 == 0)
+                    {
+                        hexDocument.Blocks.Add(hexParagraph);
+                        hexParagraph = new Paragraph();
+                    }
+                    var hexByte = new Run(fixedByte.ToString("X2") + " ");
+                    if (fixedByte != _globalManager.FixManager.CorruptedHex[i])
+                    {
+                        hexByte.Background = Brushes.Orange;
+                    }
+                    hexParagraph.Inlines.Add(hexByte);
+                    i++;
+                }
+                FixedText.Document = hexDocument;
             }
         }
     }
