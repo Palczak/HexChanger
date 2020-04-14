@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 
 namespace HexChanger
 {
@@ -36,13 +37,12 @@ namespace HexChanger
                 {
                     Hex corruptedHex = _globalManager.FileManager.HexIO.ReadHex(openFileDialog.FileName);
                     _globalManager.FixManager.CorruptedHex = corruptedHex;
-                    Loaded.Text = corruptedHex.ToString();
+                    PrintHexes();
                     if (_globalManager.FixManager.IsSet())
                     {
                         PrintAndFix();
                     }
                 }
-
             }
             catch (Exception exception)
             {
@@ -132,11 +132,11 @@ namespace HexChanger
                         }
                     }
                     Hex fixedHex = _globalManager.Fix(positionsFound);
-                    Fixed.Text = fixedHex.ToString();
+                    PrintHexes();
                 }
                 else
                 {
-                    Fixed.Text = _globalManager.FixManager.CorruptedHex.ToString();
+                    PrintHexes();
                 }
             }
             catch (Exception exception)
@@ -183,6 +183,27 @@ namespace HexChanger
                     FixedScroll.ScrollToVerticalOffset(e.VerticalOffset);
                     FixedScroll.ScrollToHorizontalOffset(e.HorizontalOffset);
                 }
+            }
+        }
+
+        private void PrintHexes()
+        {
+            if(!_globalManager.FixManager.CorruptedHex.IsEmpty)
+            {
+                CorruptedText.Text = _globalManager.FixManager.CorruptedHex.ToString();
+            }
+            else
+            {
+                CorruptedText.Text = "Wczytany plik";
+            }
+
+            if (!_globalManager.FixManager.FixedHex.IsEmpty)
+            {
+                FixedText.Text = _globalManager.FixManager.FixedHex.ToString();
+            }
+            else
+            {
+                FixedText.Text = "Naprawiony plik";
             }
         }
     }

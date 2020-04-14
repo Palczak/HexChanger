@@ -15,10 +15,10 @@
             <CheckBox Content="Zsynchronizuj przewijanie" Name="SynchScrolls" />
         </Menu>
         <ScrollViewer HorizontalAlignment="Left" Margin="10,30,0,0" Width="380" ScrollChanged="ScrollChanged" Name="CorruptedScroll">
-            <TextBlock TextWrapping="Wrap" Name="Loaded" Text="Wczytany plik" VerticalAlignment="Top" FontFamily="Courier New"/>
+            <TextBlock TextWrapping="Wrap" Name="CorruptedText" Text="Wczytany plik" VerticalAlignment="Top" FontFamily="Courier New"/>
         </ScrollViewer>
         <ScrollViewer HorizontalAlignment="Right" Margin="0,30,10,0" Width="380" ScrollChanged="ScrollChanged" Name="FixedScroll">
-            <TextBlock TextWrapping="Wrap" Name="Fixed" Text="Naprawiony plik" VerticalAlignment="Top" FontFamily="Courier New"/>
+            <TextBlock TextWrapping="Wrap" Name="FixedText" Text="Naprawiony plik" VerticalAlignment="Top" FontFamily="Courier New"/>
         </ScrollViewer>
     </Grid>
 </Window>
