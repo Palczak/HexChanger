@@ -191,75 +191,62 @@ namespace HexChanger
         private void PrintHexes()
         {
             FlowDocument hexDocument;
-
+            hexDocument = new FlowDocument();
             if (_globalManager.FixManager.CorruptedHex.IsEmpty)
             {
-                hexDocument = new FlowDocument();
                 hexDocument.Blocks.Add(new Paragraph(new Run("Wczytany plik")));
                 CorruptedText.Document = hexDocument;
             }
             else if ((!_globalManager.FixManager.CorruptedHex.IsEmpty) && _globalManager.FixManager.FixedHex.IsEmpty)
             {
-                hexDocument = new FlowDocument();
-                hexDocument.Blocks.Add(new Paragraph(new Run(_globalManager.FixManager.CorruptedHex.ToString())));
-                CorruptedText.Document = hexDocument;
+                InsertHexToBlock(CorruptedText, _globalManager.FixManager.CorruptedHex);
             }
 
+            hexDocument = new FlowDocument();
             if (_globalManager.FixManager.FixedHex.IsEmpty)
             {
-                hexDocument = new FlowDocument();
                 hexDocument.Blocks.Add(new Paragraph(new Run("Naprawiony plik")));
                 FixedText.Document = hexDocument;
             }
             else if ((!_globalManager.FixManager.FixedHex.IsEmpty) && _globalManager.FixManager.CorruptedHex.IsEmpty)
             {
-                hexDocument = new FlowDocument();
-                hexDocument.Blocks.Add(new Paragraph(new Run(_globalManager.FixManager.FixedHex.ToString())));
-                FixedText.Document = hexDocument;
+                InsertHexToBlock(FixedText, _globalManager.FixManager.FixedHex);
             }
 
             if (!_globalManager.FixManager.CorruptedHex.IsEmpty && !_globalManager.FixManager.FixedHex.IsEmpty)
             {
-                hexDocument = new FlowDocument();
-                var hexParagraph = new Paragraph();
-                int i = 0;
-                foreach (var corruptedByte in _globalManager.FixManager.CorruptedHex)
-                {
-                    if (i != 0 && i % 16 == 0)
-                    {
-                        hexDocument.Blocks.Add(hexParagraph);
-                        hexParagraph = new Paragraph();
-                    }
-                    var hexByte = new Run(corruptedByte.ToString("X2") + " ");
-                    if (corruptedByte != _globalManager.FixManager.FixedHex[i])
-                    {
-                        hexByte.Background = Brushes.Orange;
-                    }
-                    hexParagraph.Inlines.Add(hexByte);
-                    i++;
-                }
-                CorruptedText.Document = hexDocument;
-
-                hexDocument = new FlowDocument();
-                hexParagraph = new Paragraph();
-                i = 0;
-                foreach (var fixedByte in _globalManager.FixManager.FixedHex)
-                {
-                    if (i != 0 && i % 16 == 0)
-                    {
-                        hexDocument.Blocks.Add(hexParagraph);
-                        hexParagraph = new Paragraph();
-                    }
-                    var hexByte = new Run(fixedByte.ToString("X2") + " ");
-                    if (fixedByte != _globalManager.FixManager.CorruptedHex[i])
-                    {
-                        hexByte.Background = Brushes.Orange;
-                    }
-                    hexParagraph.Inlines.Add(hexByte);
-                    i++;
-                }
-                FixedText.Document = hexDocument;
+                InsertHexToBlock(CorruptedText, _globalManager.FixManager.CorruptedHex, _globalManager.FixManager.FixedHex);
+                InsertHexToBlock(FixedText, _globalManager.FixManager.FixedHex, _globalManager.FixManager.CorruptedHex);
             }
+        }
+
+        private void InsertHexToBlock(RichTextBox targetTextBlock, Hex hexToInsert, Hex comparableHex = null)
+        {
+            if (comparableHex == null)
+            {
+                comparableHex = hexToInsert;
+            }
+            var hexDocument = new FlowDocument();
+            var hexParagraph = new Paragraph();
+            int byteIndex = 0;
+            foreach (var fixedByte in hexToInsert)
+            {
+                if (byteIndex != 0 && byteIndex % 16 == 0)
+                {
+                    hexDocument.Blocks.Add(hexParagraph);
+                    hexParagraph = new Paragraph();
+                }
+
+                var hexByte = new Run(fixedByte.ToString("X2") + " ");
+
+                if (fixedByte != comparableHex[byteIndex])
+                {
+                    hexByte.Background = Brushes.Orange;
+                }
+                hexParagraph.Inlines.Add(hexByte);
+                byteIndex++;
+            }
+            targetTextBlock.Document = hexDocument;
         }
     }
 }
