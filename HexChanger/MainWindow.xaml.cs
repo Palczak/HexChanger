@@ -241,26 +241,38 @@ namespace HexChanger
             {
                 comparableHex = hexToInsert;
             }
+            bool isDifferend = false;
             var hexDocument = new FlowDocument();
             var hexParagraph = new Paragraph();
+            var hexText = new Run();
             int byteIndex = 0;
             foreach (var fixedByte in hexToInsert)
             {
                 if (byteIndex != 0 && byteIndex % 16 == 0)
                 {
-                    hexDocument.Blocks.Add(hexParagraph);
-                    hexParagraph = new Paragraph();
+                    hexText.Text += "\n";
                 }
 
-                var hexByte = new Run(fixedByte.ToString("X2") + " ");
-
-                if (fixedByte != comparableHex[byteIndex])
+                if (fixedByte != comparableHex[byteIndex] && !isDifferend)
                 {
-                    hexByte.Background = Brushes.Orange;
+                    isDifferend = true;
+                    hexParagraph.Inlines.Add(hexText);
+                    hexText = new Run();
+                    hexText.Background = Brushes.Orange;
                 }
-                hexParagraph.Inlines.Add(hexByte);
+
+                if(fixedByte == comparableHex[byteIndex] && isDifferend)
+                {
+                    isDifferend = false;
+                    hexParagraph.Inlines.Add(hexText);
+                    hexText = new Run();
+                    //hexText.Background = Brushes.White;
+                }
+                hexText.Text += fixedByte.ToString("X2") + " ";
                 byteIndex++;
             }
+            hexParagraph.Inlines.Add(hexText);
+            hexDocument.Blocks.Add(hexParagraph);
             targetTextBlock.Document = hexDocument;
         }
     }
