@@ -16,10 +16,13 @@
             <RowDefinition Height="1*" />
         </Grid.RowDefinitions>
         <Menu HorizontalAlignment="Stretch" Height="auto" VerticalAlignment="Top" Grid.ColumnSpan="2">
-            <Button Content="Otwórz plik" Width="100" Click="LoadFile"/>
-            <Button Content="Wczytaj instrukcje" Width="100" Click="LoadInstruction"/>
-            <Button Content="Napraw" Width="100" Click="Fix"/>
-            <Button Content="Zapisz" Width="100" Click="SaveFile"/>
+            <MenuItem Header="Ustawienia">
+                <MenuItem Header="Ustaw katalog instrukcji" Click="SelectInstrucionsCatalog" />
+            </MenuItem>
+            <MenuItem Header="Otwórz plik" Click="LoadFile"/>
+            <MenuItem Header="Wczytaj instrukcje" Click="LoadInstruction"/>
+            <MenuItem Header="Napraw" Click="Fix"/>
+            <MenuItem Header="Zapisz" Click="SaveFile"/>
             <CheckBox Content="Zsynchronizuj przewijanie" Name="SynchScrolls" />
         </Menu>
         <ScrollViewer HorizontalScrollBarVisibility="Visible" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,30,0,0" ScrollChanged="ScrollChanged" Name="CorruptedScroll">

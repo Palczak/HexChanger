@@ -22,6 +22,21 @@ namespace HexChanger
             _globalManager = new GlobalManager();
             InitializeComponent();
             PrintHexes();
+            MessageBox.Show(Properties.Settings.Default.InstructionsDirectory);
+        }
+
+        public void SelectInstrucionsCatalog(object sender, RoutedEventArgs e)
+        {
+            using (var fbd = new System.Windows.Forms.FolderBrowserDialog())
+            {
+                System.Windows.Forms.DialogResult result = fbd.ShowDialog();
+
+                if (result == System.Windows.Forms.DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+                {
+                    Properties.Settings.Default.InstructionsDirectory = fbd.SelectedPath;
+                    Properties.Settings.Default.Save();
+                }
+            }
         }
 
         public void LoadFile(object sender, RoutedEventArgs e)
