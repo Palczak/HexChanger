@@ -34,5 +34,17 @@ namespace HexChanger.Properties {
                 this["InstructionsDirectory"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool RepairAfterSelection {
+            get {
+                return ((bool)(this["RepairAfterSelection"]));
+            }
+            set {
+                this["RepairAfterSelection"] = value;
+            }
+        }
     }
 }

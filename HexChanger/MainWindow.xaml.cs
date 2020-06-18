@@ -3,6 +3,7 @@ using Managers;
 using Microsoft.Win32;
 using System;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -16,13 +17,26 @@ namespace HexChanger
     public partial class MainWindow : Window
     {
         private GlobalManager _globalManager;
+        private string _selectedInstructionPath;
 
         public MainWindow()
         {
             _globalManager = new GlobalManager();
             InitializeComponent();
+            ValidateRepairAfterSelection();
             PrintHexes();
-            MessageBox.Show(Properties.Settings.Default.InstructionsDirectory);
+            ValidateInstructionsCatalog();
+            BuildInstructionTree(Properties.Settings.Default.InstructionsDirectory);
+        }
+
+        private void ValidateInstructionsCatalog()
+        {
+            string instructionCatalogPath = Properties.Settings.Default.InstructionsDirectory;
+            if (!Directory.Exists(instructionCatalogPath) || !File.GetAttributes(instructionCatalogPath).HasFlag(FileAttributes.Directory))
+            {
+                Properties.Settings.Default.InstructionsDirectory = DriveInfo.GetDrives()[0].Name;
+                Properties.Settings.Default.Save();
+            }
         }
 
         public void SelectInstrucionsCatalog(object sender, RoutedEventArgs e)
@@ -36,7 +50,87 @@ namespace HexChanger
                     Properties.Settings.Default.InstructionsDirectory = fbd.SelectedPath;
                     Properties.Settings.Default.Save();
                 }
+                _selectedInstructionPath = "";
+                InstructionsTree.Items.Clear();
+                ValidateInstructionsCatalog();
+                BuildInstructionTree(Properties.Settings.Default.InstructionsDirectory);
             }
+        }
+
+        private void ValidateRepairAfterSelection()
+        {
+            RepairAfterSelectionSwitch.IsChecked = Properties.Settings.Default.RepairAfterSelection;
+        }
+
+        private void ChangeRepairAfterSelection(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.RepairAfterSelection = (bool)RepairAfterSelectionSwitch.IsChecked;
+            Properties.Settings.Default.Save();
+        }
+
+        private void BuildInstructionTree(string currentDirectory, TreeViewItem parentNode = null, bool isDirectoryInstruction = false)
+        {
+            var currentNode = new TreeViewItemInstruction();
+            currentNode.FullPath = currentDirectory;
+
+            if (Path.GetFileName(currentDirectory).Trim() == "")
+                currentNode.Header = currentDirectory;
+            else
+                currentNode.Header = Path.GetFileName(currentDirectory);
+
+            if (parentNode != null)
+                parentNode.Items.Add(currentNode);
+            else
+                InstructionsTree.Items.Add(currentNode);
+
+            if (isDirectoryInstruction)
+            {
+                currentNode.Selected += new RoutedEventHandler(InstructionSelected);
+                currentNode.Unselected += new RoutedEventHandler(InstructionUnselected);
+            }
+
+            var subDirectories = Directory.GetDirectories(currentDirectory);
+            for (int i = 0; i < subDirectories.Length; i++)
+            {
+                bool isNextDirectoryInstruction = false;
+                try
+                {
+                    Regex rx = new Regex(@".*" + _globalManager.FileManager.IdentifyName + @".*");
+                    foreach (var file in Directory.GetFiles(subDirectories[i]))
+                    {
+                        if (rx.IsMatch(file))
+                        {
+                            isNextDirectoryInstruction = true;
+                            break;
+                        }
+                    }
+                    if (!isDirectoryInstruction)
+                        BuildInstructionTree(subDirectories[i], currentNode, isNextDirectoryInstruction);
+                }
+                catch (Exception e)
+                {
+
+                }
+            }
+        }
+
+        private void InstructionSelected(object sender, RoutedEventArgs e)
+        {
+            _selectedInstructionPath = ((TreeViewItemInstruction)sender).FullPath;
+            try
+            {
+                _selectedInstructionPath = ((TreeViewItemInstruction)sender).FullPath;
+                LoadInstructions(_selectedInstructionPath);
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message);
+            }
+        }
+
+        private void InstructionUnselected(object sender, RoutedEventArgs e)
+        {
+            _selectedInstructionPath = "";
         }
 
         public void LoadFile(object sender, RoutedEventArgs e)
@@ -55,7 +149,7 @@ namespace HexChanger
                     Hex corruptedHex = _globalManager.FileManager.HexIO.ReadHex(openFileDialog.FileName);
                     _globalManager.FixManager.CorruptedHex = corruptedHex;
                     PrintHexes();
-                    if (_globalManager.FixManager.IsSet())
+                    if (_globalManager.FixManager.IsSet() && (bool)RepairAfterSelectionSwitch.IsChecked)
                     {
                         PrintAndFix();
                     }
@@ -67,7 +161,7 @@ namespace HexChanger
             }
         }
 
-        public void LoadInstruction(object sender, RoutedEventArgs e)
+        public void SelectInstructionDirectory(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -81,19 +175,22 @@ namespace HexChanger
                 Nullable<bool> result = openFileDialog.ShowDialog();
                 if (openFileDialog.FileName != "")
                 {
-                    string directory = Path.GetDirectoryName(openFileDialog.FileName);
-                    _globalManager.FileManager.InstructionDir = directory;
-                    _globalManager.FixManager.InstructionSet = _globalManager.FileManager.ReadInstructions();
-                    //Loaded.Text = _globalManager.FixManager.InstructionSet.ToString();
-                    if (_globalManager.FixManager.IsSet())
-                    {
-                        PrintAndFix();
-                    }
+                    LoadInstructions(Path.GetDirectoryName(openFileDialog.FileName));
                 }
             }
             catch (Exception exception)
             {
                 MessageBox.Show(exception.Message);
+            }
+        }
+
+        private void LoadInstructions(string directory)
+        {
+            _globalManager.FileManager.InstructionDir = directory;
+            _globalManager.FixManager.InstructionSet = _globalManager.FileManager.ReadInstructions();
+            if (_globalManager.FixManager.IsSet() && (bool)RepairAfterSelectionSwitch.IsChecked)
+            {
+                PrintAndFix();
             }
         }
 
@@ -124,7 +221,7 @@ namespace HexChanger
                 var positionsFound = _globalManager.Find();
                 if (positionsFound == null)
                 {
-                    throw new Exception("Nie znaleziono uszkodzonych segmentóws.");
+                    throw new Exception("Nie znaleziono uszkodzonych segmentów.");
                 }
 
                 if (positionsFound != null)
@@ -261,7 +358,7 @@ namespace HexChanger
                     hexText.Background = Brushes.Orange;
                 }
 
-                if(fixedByte == comparableHex[byteIndex] && isDifferend)
+                if (fixedByte == comparableHex[byteIndex] && isDifferend)
                 {
                     isDifferend = false;
                     hexParagraph.Inlines.Add(hexText);
@@ -274,6 +371,32 @@ namespace HexChanger
             hexParagraph.Inlines.Add(hexText);
             hexDocument.Blocks.Add(hexParagraph);
             targetTextBlock.Document = hexDocument;
+        }
+
+        private void OpenPdfSelectorClicked(object sender, RoutedEventArgs e)
+        {
+            if (_selectedInstructionPath == null || _selectedInstructionPath.Trim() == "")
+                return;
+            if (Directory.GetFiles(_selectedInstructionPath) == null || Directory.GetFiles(_selectedInstructionPath).Length == 0)
+                return;
+            foreach (var file in Directory.GetFiles(_selectedInstructionPath))
+            {
+                if (file.Substring(file.Length - 3) == "pdf")
+                {
+                    var selectorChild = new MenuItem
+                    {
+                        Header = file
+                    };
+                    selectorChild.Click += RunPdf;
+                    OpenPdfSelector.Items.Add(selectorChild);
+                }
+            }
+        }
+
+        private void RunPdf(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Process.Start((string)((MenuItem)sender).Header);
+            OpenPdfSelector.Items.Clear();
         }
     }
 }

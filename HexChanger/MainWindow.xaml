@@ -9,26 +9,31 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
-            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="1*" />
         </Grid.RowDefinitions>
-        <Menu HorizontalAlignment="Stretch" Height="auto" VerticalAlignment="Top" Grid.ColumnSpan="2">
+        <Menu HorizontalAlignment="Stretch" Height="auto" VerticalAlignment="Top" Grid.ColumnSpan="3">
             <MenuItem Header="Ustawienia">
                 <MenuItem Header="Ustaw katalog instrukcji" Click="SelectInstrucionsCatalog" />
+                <CheckBox Name="RepairAfterSelectionSwitch" Content="Naprawiaj po wybraniu instrukcji" Click="ChangeRepairAfterSelection"></CheckBox>
             </MenuItem>
             <MenuItem Header="Otwórz plik" Click="LoadFile"/>
-            <MenuItem Header="Wczytaj instrukcje" Click="LoadInstruction"/>
+            <MenuItem Header="Wczytaj instrukcje" Click="SelectInstructionDirectory"/>
             <MenuItem Header="Napraw" Click="Fix"/>
             <MenuItem Header="Zapisz" Click="SaveFile"/>
             <CheckBox Content="Zsynchronizuj przewijanie" Name="SynchScrolls" />
+            <MenuItem Name="OpenPdfSelector" Header="Otwórz PDF" Click="OpenPdfSelectorClicked"/>
         </Menu>
-        <ScrollViewer HorizontalScrollBarVisibility="Visible" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,30,0,0" ScrollChanged="ScrollChanged" Name="CorruptedScroll">
+        <TreeView Name="InstructionsTree" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
+        </TreeView>
+        <ScrollViewer HorizontalScrollBarVisibility="Visible" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,30,0,0" ScrollChanged="ScrollChanged" Name="CorruptedScroll">
             <RichTextBox Name="CorruptedText" MinWidth="360" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" FontFamily="Courier New" IsReadOnly="True"/>
         </ScrollViewer>
-        <ScrollViewer HorizontalScrollBarVisibility="Visible" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,30,10,0" ScrollChanged="ScrollChanged" Name="FixedScroll">
+        <ScrollViewer HorizontalScrollBarVisibility="Visible" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,30,10,0" ScrollChanged="ScrollChanged" Name="FixedScroll">
             <RichTextBox Name="FixedText" MinWidth="360" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" FontFamily="Courier New" IsReadOnly="True"/>
         </ScrollViewer>
     </Grid>

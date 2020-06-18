@@ -85,6 +85,7 @@
     <Compile Include="ConflictDialog.xaml.cs">
       <DependentUpon>ConflictDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="TreeViewItemDirectory.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
