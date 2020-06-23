@@ -21,7 +21,7 @@
                 <MenuItem Header="Ustaw katalog instrukcji" Click="SelectInstrucionsCatalog" />
                 <CheckBox Name="RepairAfterSelectionSwitch" Content="Naprawiaj po wybraniu instrukcji" Click="ChangeRepairAfterSelection"></CheckBox>
             </MenuItem>
-            <MenuItem Header="Otwórz plik" Click="LoadFile"/>
+            <MenuItem Header="Otwórz plik" Click="LoadCorruptedFile"/>
             <MenuItem Header="Wczytaj instrukcje" Click="SelectInstructionDirectory"/>
             <MenuItem Header="Napraw" Click="Fix"/>
             <MenuItem Header="Zapisz" Click="SaveFile"/>

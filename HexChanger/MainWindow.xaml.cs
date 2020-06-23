@@ -3,6 +3,7 @@ using Managers;
 using Microsoft.Win32;
 using System;
 using System.IO;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
@@ -133,7 +134,7 @@ namespace HexChanger
             _selectedInstructionPath = "";
         }
 
-        public void LoadFile(object sender, RoutedEventArgs e)
+        public void LoadCorruptedFile(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -148,6 +149,7 @@ namespace HexChanger
                 {
                     Hex corruptedHex = _globalManager.FileManager.HexIO.ReadHex(openFileDialog.FileName);
                     _globalManager.FixManager.CorruptedHex = corruptedHex;
+                    _globalManager.FixManager.FixedHex.Clear();
                     PrintHexes();
                     if (_globalManager.FixManager.IsSet() && (bool)RepairAfterSelectionSwitch.IsChecked)
                     {
@@ -341,34 +343,39 @@ namespace HexChanger
             bool isDifferend = false;
             var hexDocument = new FlowDocument();
             var hexParagraph = new Paragraph();
-            var hexText = new Run();
+            var hexRun = new Run();
+            var hexBuilder = new StringBuilder();
             int byteIndex = 0;
             foreach (var fixedByte in hexToInsert)
             {
                 if (byteIndex != 0 && byteIndex % 16 == 0)
                 {
-                    hexText.Text += "\n";
+                    //hexRun.Text += "\n";
+                    hexBuilder.Append("\n");
                 }
 
                 if (fixedByte != comparableHex[byteIndex] && !isDifferend)
                 {
                     isDifferend = true;
-                    hexParagraph.Inlines.Add(hexText);
-                    hexText = new Run();
-                    hexText.Background = Brushes.Orange;
+                    hexRun.Text = hexBuilder.ToString();
+                    hexParagraph.Inlines.Add(hexRun);
+                    hexRun = new Run();
+                    hexRun.Background = Brushes.Orange;
+                    hexBuilder.Clear();
                 }
-
-                if (fixedByte == comparableHex[byteIndex] && isDifferend)
+                else if (fixedByte == comparableHex[byteIndex] && isDifferend)
                 {
                     isDifferend = false;
-                    hexParagraph.Inlines.Add(hexText);
-                    hexText = new Run();
-                    //hexText.Background = Brushes.White;
+                    hexRun.Text = hexBuilder.ToString();
+                    hexParagraph.Inlines.Add(hexRun);
+                    hexRun = new Run();
+                    hexBuilder.Clear();
                 }
-                hexText.Text += fixedByte.ToString("X2") + " ";
+                hexBuilder.Append(fixedByte.ToString("X2") + " ");
                 byteIndex++;
             }
-            hexParagraph.Inlines.Add(hexText);
+            hexRun.Text = hexBuilder.ToString();
+            hexParagraph.Inlines.Add(hexRun);
             hexDocument.Blocks.Add(hexParagraph);
             targetTextBlock.Document = hexDocument;
         }
