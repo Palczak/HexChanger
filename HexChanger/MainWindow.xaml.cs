@@ -1,4 +1,5 @@
-﻿using Hexes;
+﻿using HexChanger.Properties;
+using Hexes;
 using Managers;
 using Microsoft.Win32;
 using System;
@@ -27,92 +28,139 @@ namespace HexChanger
             ValidateRepairAfterSelection();
             PrintHexes();
             ValidateInstructionsCatalog();
-            BuildInstructionTree(Properties.Settings.Default.InstructionsDirectory);
+            InitializeInstructionTree();
+        }
+
+        private void InitializeInstructionTree()
+        {
+            InstructionsTree.Items.Clear();
+            TreeViewItemInstruction instructionTreeNode = CreateInstructionTreeNode(Settings.Default.InstructionsDirectory);
+            InstructionsTree.Items.Add(instructionTreeNode);
+            BuildInstructionTreeBranch(instructionTreeNode);
         }
 
         private void ValidateInstructionsCatalog()
         {
-            string instructionCatalogPath = Properties.Settings.Default.InstructionsDirectory;
-            if (!Directory.Exists(instructionCatalogPath) || !File.GetAttributes(instructionCatalogPath).HasFlag(FileAttributes.Directory))
-            {
-                Properties.Settings.Default.InstructionsDirectory = DriveInfo.GetDrives()[0].Name;
-                Properties.Settings.Default.Save();
-            }
+            string instructionsDirectory = Settings.Default.InstructionsDirectory;
+            if (Directory.Exists(instructionsDirectory) && File.GetAttributes(instructionsDirectory).HasFlag(FileAttributes.Directory))
+                return;
+            Settings.Default.InstructionsDirectory = DriveInfo.GetDrives()[0].Name;
+            Settings.Default.Save();
         }
 
         public void SelectInstrucionsCatalog(object sender, RoutedEventArgs e)
         {
             using (var fbd = new System.Windows.Forms.FolderBrowserDialog())
             {
-                System.Windows.Forms.DialogResult result = fbd.ShowDialog();
-
-                if (result == System.Windows.Forms.DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+                if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
                 {
-                    Properties.Settings.Default.InstructionsDirectory = fbd.SelectedPath;
-                    Properties.Settings.Default.Save();
+                    Settings.Default.InstructionsDirectory = fbd.SelectedPath;
+                    Settings.Default.Save();
                 }
                 _selectedInstructionPath = "";
                 InstructionsTree.Items.Clear();
                 ValidateInstructionsCatalog();
-                BuildInstructionTree(Properties.Settings.Default.InstructionsDirectory);
+                InitializeInstructionTree();
             }
         }
 
         private void ValidateRepairAfterSelection()
         {
-            RepairAfterSelectionSwitch.IsChecked = Properties.Settings.Default.RepairAfterSelection;
+            RepairAfterSelectionSwitch.IsChecked = Settings.Default.RepairAfterSelection;
         }
 
         private void ChangeRepairAfterSelection(object sender, RoutedEventArgs e)
         {
-            Properties.Settings.Default.RepairAfterSelection = (bool)RepairAfterSelectionSwitch.IsChecked;
-            Properties.Settings.Default.Save();
+            Settings.Default.RepairAfterSelection = RepairAfterSelectionSwitch.IsChecked.Value;
+            Settings.Default.Save();
         }
 
-        private void BuildInstructionTree(string currentDirectory, TreeViewItem parentNode = null, bool isDirectoryInstruction = false)
+        private void BuildInstructionTreeBranch(TreeViewItemInstruction selectedNode)
         {
-            var currentNode = new TreeViewItemInstruction();
-            currentNode.FullPath = currentDirectory;
-
-            if (Path.GetFileName(currentDirectory).Trim() == "")
-                currentNode.Header = currentDirectory;
-            else
-                currentNode.Header = Path.GetFileName(currentDirectory);
-
-            if (parentNode != null)
-                parentNode.Items.Add(currentNode);
-            else
-                InstructionsTree.Items.Add(currentNode);
-
-            if (isDirectoryInstruction)
+            string[] directories = Directory.GetDirectories(selectedNode.FullPath);
+            foreach (string directory in directories)
             {
-                currentNode.Selected += new RoutedEventHandler(InstructionSelected);
-                currentNode.Unselected += new RoutedEventHandler(InstructionUnselected);
-            }
-
-            var subDirectories = Directory.GetDirectories(currentDirectory);
-            for (int i = 0; i < subDirectories.Length; i++)
-            {
-                bool isNextDirectoryInstruction = false;
                 try
                 {
-                    Regex rx = new Regex(@".*" + _globalManager.FileManager.IdentifyName + @".*");
-                    foreach (var file in Directory.GetFiles(subDirectories[i]))
+                    Directory.GetDirectories(directory);
+                    TreeViewItemInstruction newChild = null;
+                    foreach (TreeViewItemInstruction currentChild in selectedNode.Items)
                     {
-                        if (rx.IsMatch(file))
+                        if (currentChild.FullPath == directory)
                         {
-                            isNextDirectoryInstruction = true;
+                            newChild = currentChild;
                             break;
                         }
                     }
-                    if (!isDirectoryInstruction)
-                        BuildInstructionTree(subDirectories[i], currentNode, isNextDirectoryInstruction);
-                }
-                catch (Exception e)
-                {
+                    if (newChild == null)
+                    {
+                        newChild = CreateInstructionTreeNode(directory);
+                        selectedNode.Items.Add(newChild);
+                        if (directories.Length > 0 && !IsInstructionDirectory(newChild.FullPath))
+                            newChild.Expanded += ExpandtInstructionDirectory;
+                    }
+                    if (!IsInstructionDirectory(directory))
+                    {
+                        foreach (string subDirectory in Directory.GetDirectories(directory))
+                        {
+                            try
+                            {
+                                //Check for permision.
+                                Directory.GetDirectories(subDirectory);
 
+                                TreeViewItemInstruction instructionTreeNode = CreateInstructionTreeNode(subDirectory);
+                                newChild.Items.Add(instructionTreeNode);
+                                if (directories.Length > 0)
+                                    newChild.Expanded += ExpandtInstructionDirectory;
+                            }
+                            catch (Exception ex) { }
+                        }
+                    }
+                }
+                catch (Exception ex) { }
+            }
+        }
+
+        private TreeViewItemInstruction CreateInstructionTreeNode(string directoryPath)
+        {
+            TreeViewItemInstruction newNode = new TreeViewItemInstruction();
+            newNode.FullPath = directoryPath;
+            if (Path.GetFileName(directoryPath).Trim() == "")
+                newNode.Header = directoryPath;
+            else
+                newNode.Header = Path.GetFileName(directoryPath);
+            if (IsInstructionDirectory(newNode.FullPath))
+            {
+                newNode.Selected += InstructionSelected;
+                newNode.Unselected += InstructionUnselected;
+                newNode.Background = Brushes.Orange;
+            }
+            return newNode;
+        }
+
+        private bool IsInstructionDirectory(string path)
+        {
+            Regex regex = new Regex(".*" + _globalManager.FileManager.IdentifyName + ".*");
+            foreach (string file in Directory.GetFiles(path))
+            {
+                if (regex.IsMatch(file))
+                    return true;
+            }
+            return false;
+        }
+
+        public void ExpandtInstructionDirectory(object sender, RoutedEventArgs e)
+        {
+            TreeViewItemInstruction selectedNode = (TreeViewItemInstruction)sender;
+            if (!selectedNode.Items.IsEmpty)
+            {
+                foreach (TreeViewItemInstruction child in selectedNode.Items)
+                {
+                    if (!child.Items.IsEmpty)
+                        return;
                 }
             }
+            BuildInstructionTreeBranch(selectedNode);
         }
 
         private void InstructionSelected(object sender, RoutedEventArgs e)
