@@ -166,9 +166,9 @@ namespace HexChanger
         private void InstructionSelected(object sender, RoutedEventArgs e)
         {
             _selectedInstructionPath = ((TreeViewItemInstruction)sender).FullPath;
+            GeneratePdfList();
             try
             {
-                _selectedInstructionPath = ((TreeViewItemInstruction)sender).FullPath;
                 LoadInstructions(_selectedInstructionPath);
             }
             catch (Exception exception)
@@ -180,6 +180,7 @@ namespace HexChanger
         private void InstructionUnselected(object sender, RoutedEventArgs e)
         {
             _selectedInstructionPath = "";
+            GeneratePdfList();
         }
 
         public void LoadCorruptedFile(object sender, RoutedEventArgs e)
@@ -428,8 +429,9 @@ namespace HexChanger
             targetTextBlock.Document = hexDocument;
         }
 
-        private void OpenPdfSelectorClicked(object sender, RoutedEventArgs e)
+        private void GeneratePdfList()
         {
+            OpenPdfSelector.Items.Clear();
             if (_selectedInstructionPath == null || _selectedInstructionPath.Trim() == "")
                 return;
             if (Directory.GetFiles(_selectedInstructionPath) == null || Directory.GetFiles(_selectedInstructionPath).Length == 0)
@@ -451,7 +453,6 @@ namespace HexChanger
         private void RunPdf(object sender, RoutedEventArgs e)
         {
             System.Diagnostics.Process.Start((string)((MenuItem)sender).Header);
-            OpenPdfSelector.Items.Clear();
         }
     }
 }
