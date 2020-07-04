@@ -29,6 +29,16 @@ namespace HexChanger
             PrintHexes();
             ValidateInstructionsCatalog();
             InitializeInstructionTree();
+            Application.Current.MainWindow.Height = Settings.Default.MainWIndowHeight;
+            Application.Current.MainWindow.Width = Settings.Default.MainWindowWidth;
+            Application.Current.MainWindow.SizeChanged += MainWindowSizeChanged;
+        }
+
+        private void MainWindowSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            Settings.Default.MainWIndowHeight = Application.Current.MainWindow.Height;
+            Settings.Default.MainWindowWidth = Application.Current.MainWindow.Width;
+            Settings.Default.Save();
         }
 
         private void InitializeInstructionTree()
