@@ -27,6 +27,7 @@ namespace Instructions
         {
             _rawIdentifyHex = identify;
             _identifyHex = Trim(identify);
+            _identifyHex = Space(_identifyHex);
         }
 
         public override bool IsSet()
