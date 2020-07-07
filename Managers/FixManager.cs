@@ -34,6 +34,11 @@ namespace Managers
                 return false;
             }
 
+            if (identify.Count == 1 && identify[0] == -1)
+            {
+                return true;
+            }
+
             List<int> match = CorruptedHex.AllMatches(identify);
             if (match.Count == 0)
             {
