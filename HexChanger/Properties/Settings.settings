@@ -14,5 +14,8 @@
     <Setting Name="MainWindowWidth" Type="System.Double" Scope="User">
       <Value Profile="(Default)">800</Value>
     </Setting>
+    <Setting Name="IdentifyAfterSelection" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

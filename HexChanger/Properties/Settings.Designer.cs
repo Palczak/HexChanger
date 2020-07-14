@@ -70,5 +70,17 @@ namespace HexChanger.Properties {
                 this["MainWindowWidth"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool IdentifyAfterSelection {
+            get {
+                return ((bool)(this["IdentifyAfterSelection"]));
+            }
+            set {
+                this["IdentifyAfterSelection"] = value;
+            }
+        }
     }
 }

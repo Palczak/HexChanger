@@ -18,6 +18,10 @@ namespace HexChanger
     /// </summary>
     public partial class MainWindow : Window
     {
+        private const string IDENTIFIED_LABEL_TEXT = "Plik został zidentyfikowany.";
+        private const string NOT_IDENTIFIED_LABEL_TEXT = "Plik nie został zidentyfikowany.";
+        private const string SOMETHING_FOUND_LABEL_TEXT = "Plik szukający został dopasowany.";
+        private const string NOTHING_FOUND_LABEL_TEXT = "Plik szukający nie został dopasowany.";
         private GlobalManager _globalManager;
         private string _selectedInstructionPath;
 
@@ -25,7 +29,7 @@ namespace HexChanger
         {
             _globalManager = new GlobalManager();
             InitializeComponent();
-            ValidateRepairAfterSelection();
+            ValidateSettings();
             PrintHexes();
             ValidateInstructionsCatalog();
             InitializeInstructionTree();
@@ -74,14 +78,21 @@ namespace HexChanger
             }
         }
 
-        private void ValidateRepairAfterSelection()
+        private void ValidateSettings()
         {
             RepairAfterSelectionSwitch.IsChecked = Settings.Default.RepairAfterSelection;
+            IdentifyAfterSelectionSwitch.IsChecked = Settings.Default.IdentifyAfterSelection;
         }
 
         private void ChangeRepairAfterSelection(object sender, RoutedEventArgs e)
         {
             Settings.Default.RepairAfterSelection = RepairAfterSelectionSwitch.IsChecked.Value;
+            Settings.Default.Save();
+        }
+
+        private void ChangeIdentifyAfterSelection(object sender, RoutedEventArgs e)
+        {
+            Settings.Default.IdentifyAfterSelection = IdentifyAfterSelectionSwitch.IsChecked.Value;
             Settings.Default.Save();
         }
 
