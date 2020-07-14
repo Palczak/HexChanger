@@ -260,6 +260,19 @@ namespace HexChanger
         {
             _globalManager.FileManager.InstructionDir = directory;
             _globalManager.FixManager.InstructionSet = _globalManager.FileManager.ReadInstructions();
+            if(_globalManager.FixManager.IsSet() && (bool)IdentifyAfterSelectionSwitch.IsChecked)
+            {
+                if(_globalManager.FixManager.Identify())
+                {
+                    IdentifiedLabel.Content = IDENTIFIED_LABEL_TEXT;
+                    IdentifiedLabel.Background = Brushes.LightGreen;
+                }
+                else
+                {
+                    IdentifiedLabel.Content = NOT_IDENTIFIED_LABEL_TEXT;
+                    IdentifiedLabel.Background = Brushes.IndianRed;
+                }
+            }
             if (_globalManager.FixManager.IsSet() && (bool)RepairAfterSelectionSwitch.IsChecked)
             {
                 PrintAndFix();
