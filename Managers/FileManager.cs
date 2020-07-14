@@ -13,7 +13,7 @@ namespace Managers
         public string InstructionDir { get; set; }
         private readonly string _identifyName;
         public string IdentifyName { get { return _identifyName; } }
-        private readonly string _findName;
+        public readonly string FindName;
         private readonly string _replaceName;
         private readonly string _fillName;
         private readonly string _beforeName;
@@ -25,7 +25,7 @@ namespace Managers
             HexIO = new HexIO();
             InstructionDir = "";
             _identifyName = "ident";
-            _findName = "find";
+            FindName = "find";
             _replaceName = "replace";
             _fillName = "fill";
             _beforeName = "before";
@@ -93,10 +93,10 @@ namespace Managers
 
         private List<Find> ReadFind()
         {
-            Regex rx = new Regex(_findName + "\\d{3}.*");
+            Regex rx = new Regex(FindName + "\\d{3}.*");
             var resultFindList = new List<Find>();
 
-            string findDir = Path.Combine(InstructionDir, _findName);
+            string findDir = Path.Combine(InstructionDir, FindName);
             if(!Directory.Exists(findDir))
             {
                 throw new Exception("Nie znaleziono katalogu z plikami szukającymi.");
@@ -104,14 +104,14 @@ namespace Managers
             string[] rawPaths = Directory.GetFiles(findDir);
             if (rawPaths.Length == 0)
             {
-                throw new Exception("Nie znaleziono ani jednego pliku szukającego " + _findName + ".");
+                throw new Exception("Nie znaleziono ani jednego pliku szukającego " + FindName + ".");
             }
             foreach (string path in rawPaths)
             {
                 string name = Path.GetFileName(path);
                 if (rx.IsMatch(name))
                 {
-                    int index = int.Parse(name.Substring(_findName.Length, 3));
+                    int index = int.Parse(name.Substring(FindName.Length, 3));
                     resultFindList.Add(new Find(HexIO.ReadHex(path), index));
                 }
             }

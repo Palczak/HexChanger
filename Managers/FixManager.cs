@@ -24,6 +24,8 @@ namespace Managers
 
         public bool IsResultSet() { return !FixedHex.IsEmpty; }
 
+        public bool IsInstructionSet() { return InstructionSet.IsSet(); }
+
         public bool Identify()
         {
             Hex identifyRaw = InstructionSet.Identify.RawIdenfityHex;

@@ -104,11 +104,11 @@ namespace HexChanger
             switch (state)
             {
                 case Label_state.Valid:
-                    IdentifiedLabel.Content = "Plik został zidentyfikowany.";
+                    IdentifiedLabel.Content = "Plik zidentyfikowany";
                     IdentifiedLabel.Background = Brushes.LightGreen;
                     break;
                 case Label_state.Invalid:
-                    IdentifiedLabel.Content = "Plik nie został zidentyfikowany.";
+                    IdentifiedLabel.Content = "Plik nie zidentyfikowany";
                     IdentifiedLabel.Background = Brushes.IndianRed;
                     break;
                 case Label_state.Clear:
@@ -120,14 +120,16 @@ namespace HexChanger
 
         private void ChangeFoundLabelState(Label_state state)
         {
+            string fileName = _globalManager.FileManager.FindName;
+            fileName = char.ToUpper(fileName[0]) + fileName.Substring(1);
             switch (state)
             {
                 case Label_state.Valid:
-                    SomethingFoundLabel.Content = "Plik szukający został dopasowany.";
+                    SomethingFoundLabel.Content = fileName + " znaleziony";
                     SomethingFoundLabel.Background = Brushes.LightGreen;
                     break;
                 case Label_state.Invalid:
-                    SomethingFoundLabel.Content = "Plik szukający nie został dopasowany.";
+                    SomethingFoundLabel.Content = fileName + " nie znaleziony";
                     SomethingFoundLabel.Background = Brushes.IndianRed;
                     break;
                 case Label_state.Clear:
@@ -258,12 +260,20 @@ namespace HexChanger
                 Nullable<bool> result = openFileDialog.ShowDialog();
                 if (openFileDialog.FileName != "")
                 {
-                    ChangeFoundLabelState(Label_state.Clear);
-                    ChangeIdentifyLableState(Label_state.Clear);
                     Hex corruptedHex = _globalManager.FileManager.HexIO.ReadHex(openFileDialog.FileName);
                     _globalManager.FixManager.CorruptedHex = corruptedHex;
                     _globalManager.FixManager.FixedHex.Clear();
                     PrintHexes();
+
+                    ChangeFoundLabelState(Label_state.Clear);
+                    if (_globalManager.FixManager.IsInstructionSet() && (bool)IdentifyAfterSelectionSwitch.IsChecked)
+                    {
+                        if (_globalManager.FixManager.Identify())
+                            ChangeIdentifyLableState(Label_state.Valid);
+                        else
+                            ChangeIdentifyLableState(Label_state.Invalid);
+                    }
+
                     if (_globalManager.FixManager.IsSet() && (bool)RepairAfterSelectionSwitch.IsChecked)
                     {
                         PrintAndFix();
@@ -348,13 +358,9 @@ namespace HexChanger
                 var positionsFound = _globalManager.Find();
 
                 if (positionsFound != null)
-                {
                     ChangeFoundLabelState(Label_state.Valid);
-                }
                 else
-                {
                     ChangeFoundLabelState(Label_state.Invalid);
-                }
 
                 if (positionsFound != null)
                 {
