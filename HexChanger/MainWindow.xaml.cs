@@ -18,12 +18,15 @@ namespace HexChanger
     /// </summary>
     public partial class MainWindow : Window
     {
-        private const string IDENTIFIED_LABEL_TEXT = "Plik został zidentyfikowany.";
-        private const string NOT_IDENTIFIED_LABEL_TEXT = "Plik nie został zidentyfikowany.";
-        private const string SOMETHING_FOUND_LABEL_TEXT = "Plik szukający został dopasowany.";
-        private const string NOTHING_FOUND_LABEL_TEXT = "Plik szukający nie został dopasowany.";
         private GlobalManager _globalManager;
         private string _selectedInstructionPath;
+
+        private enum Label_state
+        {
+            Valid,
+            Invalid,
+            Clear
+        }
 
         public MainWindow()
         {
@@ -94,6 +97,44 @@ namespace HexChanger
         {
             Settings.Default.IdentifyAfterSelection = IdentifyAfterSelectionSwitch.IsChecked.Value;
             Settings.Default.Save();
+        }
+
+        private void ChangeIdentifyLableState(Label_state state)
+        {
+            switch (state)
+            {
+                case Label_state.Valid:
+                    IdentifiedLabel.Content = "Plik został zidentyfikowany.";
+                    IdentifiedLabel.Background = Brushes.LightGreen;
+                    break;
+                case Label_state.Invalid:
+                    IdentifiedLabel.Content = "Plik nie został zidentyfikowany.";
+                    IdentifiedLabel.Background = Brushes.IndianRed;
+                    break;
+                case Label_state.Clear:
+                    IdentifiedLabel.Content = "";
+                    IdentifiedLabel.Background = Brushes.White;
+                    break;
+            }
+        }
+
+        private void ChangeFoundLabelState(Label_state state)
+        {
+            switch (state)
+            {
+                case Label_state.Valid:
+                    SomethingFoundLabel.Content = "Plik szukający został dopasowany.";
+                    SomethingFoundLabel.Background = Brushes.LightGreen;
+                    break;
+                case Label_state.Invalid:
+                    SomethingFoundLabel.Content = "Plik szukający nie został dopasowany.";
+                    SomethingFoundLabel.Background = Brushes.IndianRed;
+                    break;
+                case Label_state.Clear:
+                    SomethingFoundLabel.Content = "";
+                    SomethingFoundLabel.Background = Brushes.White;
+                    break;
+            }
         }
 
         private void BuildInstructionTreeBranch(TreeViewItemInstruction selectedNode)
@@ -217,6 +258,8 @@ namespace HexChanger
                 Nullable<bool> result = openFileDialog.ShowDialog();
                 if (openFileDialog.FileName != "")
                 {
+                    ChangeFoundLabelState(Label_state.Clear);
+                    ChangeIdentifyLableState(Label_state.Clear);
                     Hex corruptedHex = _globalManager.FileManager.HexIO.ReadHex(openFileDialog.FileName);
                     _globalManager.FixManager.CorruptedHex = corruptedHex;
                     _globalManager.FixManager.FixedHex.Clear();
@@ -260,17 +303,16 @@ namespace HexChanger
         {
             _globalManager.FileManager.InstructionDir = directory;
             _globalManager.FixManager.InstructionSet = _globalManager.FileManager.ReadInstructions();
-            if(_globalManager.FixManager.IsSet() && (bool)IdentifyAfterSelectionSwitch.IsChecked)
+            ChangeFoundLabelState(Label_state.Clear);
+            if (_globalManager.FixManager.IsSet() && (bool)IdentifyAfterSelectionSwitch.IsChecked)
             {
-                if(_globalManager.FixManager.Identify())
+                if (_globalManager.FixManager.Identify())
                 {
-                    IdentifiedLabel.Content = IDENTIFIED_LABEL_TEXT;
-                    IdentifiedLabel.Background = Brushes.LightGreen;
+                    ChangeIdentifyLableState(Label_state.Valid);
                 }
                 else
                 {
-                    IdentifiedLabel.Content = NOT_IDENTIFIED_LABEL_TEXT;
-                    IdentifiedLabel.Background = Brushes.IndianRed;
+                    ChangeIdentifyLableState(Label_state.Invalid);
                 }
             }
             if (_globalManager.FixManager.IsSet() && (bool)RepairAfterSelectionSwitch.IsChecked)
@@ -304,9 +346,14 @@ namespace HexChanger
                 }
 
                 var positionsFound = _globalManager.Find();
-                if (positionsFound == null)
+
+                if (positionsFound != null)
                 {
-                    throw new Exception("Nie znaleziono uszkodzonych segmentów.");
+                    ChangeFoundLabelState(Label_state.Valid);
+                }
+                else
+                {
+                    ChangeFoundLabelState(Label_state.Invalid);
                 }
 
                 if (positionsFound != null)
