@@ -11,40 +11,44 @@ namespace HexChanger
     {
         private Dictionary<int, List<CheckBox>> _checkBoxes;
         public Dictionary<int, List<int>> SolvedConflicts { get; set; }
-        private Dictionary<int, List<int>> _inputData;
+        private readonly Dictionary<int, List<int>> _inputData;
 
         public ConflictDialog(Dictionary<int, List<int>> positionsFound) : base()
         {
             InitializeComponent();
             _inputData = positionsFound;
-            int longestLength = 0;
+            int longestConflictList = 0;
             //header
             CheckGrid.RowDefinitions.Add(new RowDefinition());
-            int c = 0;
+            int columnIndex = 0;
 
             foreach (var position in positionsFound)
             {
+                //if Value.Count is > 1 that means we got a coflict
                 if (position.Value.Count > 1)
                 {
                     CheckGrid.ColumnDefinitions.Add(new ColumnDefinition());
                     var label = new Label();
 
+                    //creating header in conflict column
                     string formatedHeader = position.Key.ToString();
                     while (formatedHeader.Length < 3)
                         formatedHeader = "0" + formatedHeader;
                     formatedHeader = "find" + formatedHeader;
                     label.Content = formatedHeader;
 
-                    Grid.SetColumn(label, c);
+                    //seting header in right collumn
+                    Grid.SetColumn(label, columnIndex);
                     Grid.SetRow(label, 0);
                     CheckGrid.Children.Add(label);
-                    c++;
+                    columnIndex++;
                 }
-                if (position.Value.Count > longestLength)
-                    longestLength = position.Value.Count;
+                if (position.Value.Count > longestConflictList)
+                    longestConflictList = position.Value.Count;
             }
 
-            for (int k = 0; k < longestLength; k++)
+            //Adding rows based on longest list
+            for (int k = 0; k < longestConflictList; k++)
                 CheckGrid.RowDefinitions.Add(new RowDefinition());
 
             _checkBoxes = new Dictionary<int, List<CheckBox>>();
