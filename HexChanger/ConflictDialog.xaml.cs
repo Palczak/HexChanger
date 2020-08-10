@@ -21,30 +21,31 @@ namespace HexChanger
             //header
             CheckGrid.RowDefinitions.Add(new RowDefinition());
             int c = 0;
+
             foreach (var position in positionsFound)
             {
                 if (position.Value.Count > 1)
                 {
                     CheckGrid.ColumnDefinitions.Add(new ColumnDefinition());
-                    var label = new Label
-                    {
-                        Content = position.Key.ToString()
-                    };
+                    var label = new Label();
+
+                    string formatedHeader = position.Key.ToString();
+                    while (formatedHeader.Length < 3)
+                        formatedHeader = "0" + formatedHeader;
+                    formatedHeader = "find" + formatedHeader;
+                    label.Content = formatedHeader;
+
                     Grid.SetColumn(label, c);
                     Grid.SetRow(label, 0);
                     CheckGrid.Children.Add(label);
                     c++;
                 }
                 if (position.Value.Count > longestLength)
-                {
                     longestLength = position.Value.Count;
-                }
             }
 
             for (int k = 0; k < longestLength; k++)
-            {
                 CheckGrid.RowDefinitions.Add(new RowDefinition());
-            }
 
             _checkBoxes = new Dictionary<int, List<CheckBox>>();
             int i = 0;
@@ -60,6 +61,7 @@ namespace HexChanger
                         var checkBox = new CheckBox
                         {
                             Content = index.ToString(),
+                            IsChecked = true,
                             Height = 30
                         };
 
@@ -87,30 +89,18 @@ namespace HexChanger
                 {
                     bool isChecked = false;
                     if (checkbox.IsChecked == null)
-                    {
                         isChecked = false;
-                    }
                     else
-                    {
                         isChecked = (bool)checkbox.IsChecked;
-                    }
                     if (isChecked)
-                    {
                         indexes.Add(int.Parse(checkbox.Content.ToString()));
-                    }
                 }
                 if (indexes.Count > 0)
-                {
                     solvedConficts.Add(column.Key, indexes);
-                }
             }
             foreach (var postion in _inputData)
-            {
                 if (postion.Value.Count == 1)
-                {
                     solvedConficts.Add(postion.Key, postion.Value);
-                }
-            }
             return solvedConficts;
         }
 
