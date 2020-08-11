@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace HexChanger
 {
@@ -17,6 +18,8 @@ namespace HexChanger
         public Dictionary<int, List<int>> SolvedConflicts { get; set; }
         private readonly Dictionary<int, List<int>> _inputData;
         private readonly string _currentInstructionPath;
+        private CheckBox _lastClickedCheckBoxWithShift;
+        private Dictionary<int, Grid> _internalGrids = new Dictionary<int, Grid>();
 
         public ConflictDialog(Dictionary<int, List<int>> positionsFound, string currentInstructionPath) : base()
         {
@@ -74,6 +77,7 @@ namespace HexChanger
                             IsChecked = true,
                             Height = 30
                         };
+                        checkBox.Click += CheckBox_Click;
 
                         internalGrid.Children.Add(checkBox);
                         Grid.SetColumn(checkBox, 0);
@@ -81,6 +85,8 @@ namespace HexChanger
                         checkBoxes.Add(checkBox);
                         j++;
                     }
+                    _internalGrids.Add(i, internalGrid);
+
                     ScrollViewer internalScroll = new ScrollViewer
                     {
                         Content = internalGrid,
@@ -94,8 +100,8 @@ namespace HexChanger
                     i++;
                 }
             }
-            base.SizeChanged += ConflictDialog_SizeChanged;
             LoadSettings();
+            base.SizeChanged += ConflictDialog_SizeChanged;
         }
 
         private Dictionary<int, List<int>> Solve()
@@ -161,6 +167,53 @@ namespace HexChanger
             Settings.Default.ConflictDialogHeight = base.Height;
             Settings.Default.ConflictDialogWidth = base.Width;
             Settings.Default.Save();
+        }
+
+        private void CheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            var clickedCheckBox = (CheckBox)sender;
+            if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+            {
+                if (_lastClickedCheckBoxWithShift == null)
+                    _lastClickedCheckBoxWithShift = clickedCheckBox;
+                else
+                {
+                    int clickedColumn = Grid.GetColumn((ScrollViewer)((Grid)clickedCheckBox.Parent).Parent);
+                    int lastColumn = Grid.GetColumn((ScrollViewer)((Grid)_lastClickedCheckBoxWithShift.Parent).Parent);
+
+                    if (clickedColumn != lastColumn || _lastClickedCheckBoxWithShift == clickedCheckBox)
+                    {
+                        _lastClickedCheckBoxWithShift = null;
+                        return;
+                    }
+
+                    int topRow;
+                    int bottomRow;
+                    if (Grid.GetRow(clickedCheckBox) > Grid.GetRow(_lastClickedCheckBoxWithShift))
+                    {
+                        topRow = Grid.GetRow(_lastClickedCheckBoxWithShift);
+                        bottomRow = Grid.GetRow(clickedCheckBox);
+                    }
+                    else
+                    {
+                        topRow = Grid.GetRow(clickedCheckBox);
+                        bottomRow = Grid.GetRow(_lastClickedCheckBoxWithShift);
+                    }
+                    foreach (CheckBox child in _internalGrids[clickedColumn].Children)
+                    {
+                        if (Grid.GetRow(child) >= topRow && Grid.GetRow(child) <= bottomRow)
+                        {
+                            if ((bool)_lastClickedCheckBoxWithShift.IsChecked)
+                                child.IsChecked = true;
+                            else
+                                child.IsChecked = false;
+                        }
+                    }
+                    _lastClickedCheckBoxWithShift = null;
+                }
+            }
+            else
+                _lastClickedCheckBoxWithShift = null;
         }
     }
 }
