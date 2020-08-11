@@ -301,6 +301,7 @@ namespace HexChanger
                 if (openFileDialog.FileName != "")
                 {
                     LoadInstructions(Path.GetDirectoryName(openFileDialog.FileName));
+                    _selectedInstructionPath = Path.GetDirectoryName(openFileDialog.FileName);
                 }
             }
             catch (Exception exception)
@@ -376,7 +377,7 @@ namespace HexChanger
                     }
                     if (isConflict)
                     {
-                        ConflictDialog dialog = new ConflictDialog(positionsFound);
+                        ConflictDialog dialog = new ConflictDialog(positionsFound, _selectedInstructionPath);
                         dialog.ShowDialog();
                         if (dialog.SolvedConflicts != null)
                         {

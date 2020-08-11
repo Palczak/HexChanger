@@ -6,12 +6,23 @@
         mc:Ignorable="d"
         Title="Wykryto konflikty" Topmost="True" WindowStyle="ToolWindow" SizeToContent="WidthAndHeight">
     <Grid>
-        <Grid x:Name ="CheckGrid" Margin="0,0,0,20" HorizontalAlignment="Left">
-
-
-        </Grid>
-        <Button Content="Zamień dla zaznaczonych konfliktów" Width="Auto" Height="30" HorizontalAlignment="Center" VerticalAlignment="Bottom" Click="Submit">
-
-        </Button>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <ScrollViewer VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Visible" Grid.Row="0" HorizontalAlignment="Center" Grid.ColumnSpan="2">
+            <Grid x:Name ="CheckBoxGrid" Margin="0,0,0,20" HorizontalAlignment="Left">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+            </Grid>
+        </ScrollViewer>
+        <Button Grid.Row="1" Grid.Column="0" Content="Zamień dla zaznaczonych konfliktów" Width="Auto" Height="30" HorizontalAlignment="Center" VerticalAlignment="Bottom" Click="Submit" />
+        <Button Grid.Row="1" Grid.Column="1" Content="Otwórz find.txt" Width="Auto" Height="30" HorizontalAlignment="Center" VerticalAlignment="Bottom" Click="OpenFindTxt"/>
     </Grid>
 </Window>

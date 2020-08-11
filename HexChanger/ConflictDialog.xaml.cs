@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -9,56 +12,58 @@ namespace HexChanger
     /// </summary>
     public partial class ConflictDialog : Window
     {
-        private Dictionary<int, List<CheckBox>> _checkBoxes;
+        private Dictionary<int, List<CheckBox>> _checkBoxes = new Dictionary<int, List<CheckBox>>();
         public Dictionary<int, List<int>> SolvedConflicts { get; set; }
         private readonly Dictionary<int, List<int>> _inputData;
+        private readonly string _currentInstructionPath;
 
-        public ConflictDialog(Dictionary<int, List<int>> positionsFound) : base()
+        public ConflictDialog(Dictionary<int, List<int>> positionsFound, string currentInstructionPath) : base()
         {
             InitializeComponent();
+            _currentInstructionPath = currentInstructionPath;
             _inputData = positionsFound;
             int longestConflictList = 0;
             //header
-            CheckGrid.RowDefinitions.Add(new RowDefinition());
             int columnIndex = 0;
 
-            foreach (var position in positionsFound)
+            foreach (var findFileNumber in positionsFound.Keys)
             {
+                if (positionsFound[findFileNumber].Count > longestConflictList)
+                    longestConflictList = positionsFound[findFileNumber].Count;
                 //if Value.Count is > 1 that means we got a coflict
-                if (position.Value.Count > 1)
-                {
-                    CheckGrid.ColumnDefinitions.Add(new ColumnDefinition());
-                    var label = new Label();
+                if (positionsFound[findFileNumber].Count <= 1)
+                    continue;
 
-                    //creating header in conflict column
-                    string formatedHeader = position.Key.ToString();
-                    while (formatedHeader.Length < 3)
-                        formatedHeader = "0" + formatedHeader;
-                    formatedHeader = "find" + formatedHeader;
-                    label.Content = formatedHeader;
+                CheckBoxGrid.ColumnDefinitions.Add(new ColumnDefinition());
+                //creating header in conflict column
+                var label = new Label();
+                string formatedHeader = findFileNumber.ToString();
+                while (formatedHeader.Length < 3)
+                    formatedHeader = "0" + formatedHeader;
+                formatedHeader = "find" + formatedHeader;
+                label.Content = formatedHeader;
 
-                    //seting header in right collumn
-                    Grid.SetColumn(label, columnIndex);
-                    Grid.SetRow(label, 0);
-                    CheckGrid.Children.Add(label);
-                    columnIndex++;
-                }
-                if (position.Value.Count > longestConflictList)
-                    longestConflictList = position.Value.Count;
+                //seting header in right collumn
+                Grid.SetColumn(label, columnIndex);
+                Grid.SetRow(label, 0);
+                CheckBoxGrid.Children.Add(label);
+                columnIndex++;
             }
 
-            //Adding rows based on longest list
-            for (int k = 0; k < longestConflictList; k++)
-                CheckGrid.RowDefinitions.Add(new RowDefinition());
-
-            _checkBoxes = new Dictionary<int, List<CheckBox>>();
             int i = 0;
-            int j = 1;
             foreach (var position in positionsFound)
             {
                 if (position.Value.Count > 1)
                 {
-                    j = 1;
+                    Grid internalGrid = new Grid
+                    {
+                        VerticalAlignment = VerticalAlignment.Top
+                    };
+                    for (int rowsCount = 0; rowsCount < position.Value.Count; rowsCount++)
+                    {
+                        internalGrid.RowDefinitions.Add(new RowDefinition());
+                    }
+                    int j = 0;
                     var checkBoxes = new List<CheckBox>();
                     foreach (var index in position.Value)
                     {
@@ -69,18 +74,25 @@ namespace HexChanger
                             Height = 30
                         };
 
-                        Grid.SetColumn(checkBox, i);
+                        internalGrid.Children.Add(checkBox);
+                        Grid.SetColumn(checkBox, 0);
                         Grid.SetRow(checkBox, j);
-                        CheckGrid.Children.Add(checkBox);
                         checkBoxes.Add(checkBox);
                         j++;
                     }
+                    ScrollViewer internalScroll = new ScrollViewer
+                    {
+                        Content = internalGrid,
+                        HorizontalAlignment = HorizontalAlignment.Stretch,
+                        VerticalScrollBarVisibility = ScrollBarVisibility.Visible
+                    };
+                    CheckBoxGrid.Children.Add(internalScroll);
+                    Grid.SetColumn(internalScroll, i);
+                    Grid.SetRow(internalScroll, 1);
                     _checkBoxes.Add(position.Key, checkBoxes);
                     i++;
                 }
             }
-            CheckGrid.Height = CheckGrid.RowDefinitions.Count * 30;
-            CheckGrid.Width = CheckGrid.ColumnDefinitions.Count * 100;
         }
 
         private Dictionary<int, List<int>> Solve()
@@ -112,6 +124,18 @@ namespace HexChanger
         {
             SolvedConflicts = Solve();
             Close();
+        }
+
+        public void OpenFindTxt(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Process.Start(_currentInstructionPath + Path.DirectorySeparatorChar + "find.txt");
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Nie znaleziono pliku find.txt");
+            }
         }
     }
 }
