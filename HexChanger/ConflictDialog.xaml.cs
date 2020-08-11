@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HexChanger.Properties;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -22,8 +23,8 @@ namespace HexChanger
             InitializeComponent();
             _currentInstructionPath = currentInstructionPath;
             _inputData = positionsFound;
+
             int longestConflictList = 0;
-            //header
             int columnIndex = 0;
 
             foreach (var findFileNumber in positionsFound.Keys)
@@ -93,6 +94,8 @@ namespace HexChanger
                     i++;
                 }
             }
+            base.SizeChanged += ConflictDialog_SizeChanged;
+            LoadSettings();
         }
 
         private Dictionary<int, List<int>> Solve()
@@ -136,6 +139,28 @@ namespace HexChanger
             {
                 MessageBox.Show("Nie znaleziono pliku find.txt");
             }
+        }
+
+        private void LoadSettings()
+        {
+            base.Left = Settings.Default.ConflictDialogX;
+            base.Top = Settings.Default.ConflictDialogY;
+            base.Height = Settings.Default.ConflictDialogHeight;
+            base.Width = Settings.Default.ConflictDialogWidth;
+        }
+
+        private void ConflictDialog_LocationChanged(object sender, EventArgs e)
+        {
+            Settings.Default.ConflictDialogX = base.Left;
+            Settings.Default.ConflictDialogY = base.Top;
+            Settings.Default.Save();
+        }
+
+        private void ConflictDialog_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            Settings.Default.ConflictDialogHeight = base.Height;
+            Settings.Default.ConflictDialogWidth = base.Width;
+            Settings.Default.Save();
         }
     }
 }

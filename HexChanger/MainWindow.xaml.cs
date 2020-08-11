@@ -177,7 +177,7 @@ namespace HexChanger
                                 if (directories.Length > 0)
                                     newChild.Expanded += ExpandtInstructionDirectory;
                             }
-                            catch (Exception ex) { }
+                            catch (Exception) { }
                         }
                     }
                 }
