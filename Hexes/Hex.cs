@@ -21,19 +21,15 @@ namespace Hexes
                     int counter = 0;
                     for (int j = 0; j < hex.Count; j++)
                     {
-                        if (this[i + j] == hex[j] || hex[j] == -1)
-                        {
-                            counter++;
-                        }
-                        else
-                        {
+                        if (i + j >= this.Count)
                             break;
-                        }
+                        else if (this[i + j] == hex[j] || hex[j] == -1)
+                            counter++;
+                        else
+                            break;
                     }
                     if (hex.Count == counter)
-                    {
                         indexes.Add(i);
-                    }
                 }
             }
             return indexes;
@@ -41,6 +37,8 @@ namespace Hexes
 
         public void Replace(int startIndex, Hex hex)
         {
+            if (startIndex < 0 || startIndex + hex.Count > this.Count)
+                return;
             foreach (int value in hex)
             {
                 if (value != -1)
@@ -53,7 +51,7 @@ namespace Hexes
 
         public new string ToString()
         {
-            if(IsEmpty)
+            if (IsEmpty)
             {
                 return "empty";
             }
