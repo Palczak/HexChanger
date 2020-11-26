@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:HexChanger"
         LocationChanged="MainWindow_LocationChanged"
         mc:Ignorable="d"
-        Title="Hex changer" Height="450" Width="800">
+        Title="Hex changer - elektronikkalisz@wp.pl" Height="450" Width="800">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
