@@ -36,12 +36,26 @@ namespace HexChanger
             PrintHexes();
             ValidateInstructionsCatalog();
             InitializeInstructionTree();
-            Application.Current.MainWindow.Height = Settings.Default.MainWIndowHeight;
-            Application.Current.MainWindow.Width = Settings.Default.MainWindowWidth;
-            Application.Current.MainWindow.SizeChanged += MainWindowSizeChanged;
+            LoadSettings();
+            Application.Current.MainWindow.SizeChanged += MainWindow_SizeChanged;
         }
 
-        private void MainWindowSizeChanged(object sender, SizeChangedEventArgs e)
+        private void LoadSettings()
+        {
+            Left = Settings.Default.MainWindowX;
+            Top = Settings.Default.MainWindowY;
+            Height = Settings.Default.MainWIndowHeight;
+            Width = Settings.Default.MainWindowWidth;
+        }
+
+        private void MainWindow_LocationChanged(object sender, EventArgs e)
+        {
+            Settings.Default.MainWindowX = Left;
+            Settings.Default.MainWindowY = Top;
+            Settings.Default.Save();
+        }
+
+        private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             Settings.Default.MainWIndowHeight = Application.Current.MainWindow.Height;
             Settings.Default.MainWindowWidth = Application.Current.MainWindow.Width;

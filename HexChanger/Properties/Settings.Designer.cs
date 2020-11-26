@@ -130,5 +130,29 @@ namespace HexChanger.Properties {
                 this["ConflictDialogWidth"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double MainWindowX {
+            get {
+                return ((double)(this["MainWindowX"]));
+            }
+            set {
+                this["MainWindowX"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double MainWindowY {
+            get {
+                return ((double)(this["MainWindowY"]));
+            }
+            set {
+                this["MainWindowY"] = value;
+            }
+        }
     }
 }

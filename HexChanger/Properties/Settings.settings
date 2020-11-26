@@ -29,5 +29,11 @@
     <Setting Name="ConflictDialogWidth" Type="System.Double" Scope="User">
       <Value Profile="(Default)">800</Value>
     </Setting>
+    <Setting Name="MainWindowX" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="MainWindowY" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
