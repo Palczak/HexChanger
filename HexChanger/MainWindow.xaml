@@ -26,7 +26,7 @@
             <MenuItem Header="Wczytaj instrukcje" Click="SelectInstructionDirectory"/>
             <MenuItem Header="Napraw" Click="Fix"/>
             <MenuItem Header="Zapisz" Click="SaveFile"/>
-            <CheckBox Content="Zsynchronizuj przewijanie" Name="SynchScrolls" />
+            <CheckBox Content="Zsynchronizuj przewijanie" Name="SynchScrolls" IsChecked="True"/>
             <MenuItem Name="OpenPdfSelector" Header="Otwórz PDF"/>
         </Menu>
         <TreeView Name="InstructionsTree" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
@@ -49,15 +49,15 @@
             <ScrollViewer HorizontalScrollBarVisibility="Visible" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Top" ScrollChanged="ScrollChanged" Name="CorruptedScroll">
                 <RichTextBox Name="CorruptedText" MinWidth="360" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" FontFamily="Courier New" IsReadOnly="True"/>
             </ScrollViewer>
-            <ScrollViewer HorizontalScrollBarVisibility="Visible" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Top" Name="CorruptedScrollAscii">
-                <RichTextBox Name="CorruptedAscii" MinWidth="360" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" FontFamily="Courier New" IsReadOnly="True"/>
+            <ScrollViewer HorizontalScrollBarVisibility="Visible" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Top" ScrollChanged="ScrollChanged" Name="CorruptedScrollAscii">
+                <RichTextBox Name="CorruptedAscii" MinWidth="180" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" FontFamily="Courier New" IsReadOnly="True"/>
             </ScrollViewer>
 
             <ScrollViewer HorizontalScrollBarVisibility="Visible" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Top" ScrollChanged="ScrollChanged" Name="FixedScroll">
                 <RichTextBox Name="FixedText" MinWidth="360" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" FontFamily="Courier New" IsReadOnly="True"/>
             </ScrollViewer>
-            <ScrollViewer HorizontalScrollBarVisibility="Visible" Grid.Row="1" Grid.Column="3" HorizontalAlignment="Stretch" VerticalAlignment="Top" Name="FixedScrollAscii">
-                <RichTextBox Name="FixedAscii" MinWidth="360" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" FontFamily="Courier New" IsReadOnly="True"/>
+            <ScrollViewer HorizontalScrollBarVisibility="Visible" Grid.Row="1" Grid.Column="3" HorizontalAlignment="Stretch" VerticalAlignment="Top" ScrollChanged="ScrollChanged" Name="FixedScrollAscii">
+                <RichTextBox Name="FixedAscii" MinWidth="180" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" FontFamily="Courier New" IsReadOnly="True"/>
             </ScrollViewer>
         </Grid>
     </Grid>

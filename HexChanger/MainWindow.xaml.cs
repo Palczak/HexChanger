@@ -440,16 +440,37 @@ namespace HexChanger
         {
             if ((bool)SynchScrolls.IsChecked)
             {
-                if (sender == FixedScroll)
+                if (sender == FixedScroll || sender == FixedScrollAscii)
                 {
                     CorruptedScroll.ScrollToVerticalOffset(e.VerticalOffset);
                     CorruptedScroll.ScrollToHorizontalOffset(e.HorizontalOffset);
+                    CorruptedScrollAscii.ScrollToVerticalOffset(e.VerticalOffset);
+                    if (sender == FixedScrollAscii)
+                    {
+                        FixedScroll.ScrollToVerticalOffset(e.VerticalOffset);
+                    }
                 }
-                else
+                else if (sender == CorruptedScroll || sender == CorruptedScrollAscii)
                 {
                     FixedScroll.ScrollToVerticalOffset(e.VerticalOffset);
                     FixedScroll.ScrollToHorizontalOffset(e.HorizontalOffset);
+                    FixedScrollAscii.ScrollToVerticalOffset(e.VerticalOffset);
+                    if(sender == CorruptedScrollAscii)
+                    {
+                        CorruptedScroll.ScrollToVerticalOffset(e.VerticalOffset);
+                    }
                 }
+            }
+
+            if (sender == FixedScroll)
+            {
+                FixedScrollAscii.ScrollToVerticalOffset(e.VerticalOffset);
+                //FixedScrollAscii.ScrollToHorizontalOffset(e.HorizontalOffset);
+            }
+            else if (sender == CorruptedScroll)
+            {
+                CorruptedScrollAscii.ScrollToVerticalOffset(e.VerticalOffset);
+                //CorruptedScrollAscii.ScrollToHorizontalOffset(e.HorizontalOffset);
             }
         }
 
@@ -465,6 +486,7 @@ namespace HexChanger
             else if ((!_globalManager.FixManager.CorruptedHex.IsEmpty) && _globalManager.FixManager.FixedHex.IsEmpty)
             {
                 InsertHexToBlock(CorruptedText, _globalManager.FixManager.CorruptedHex);
+                InsertHexToBlock(CorruptedAscii, _globalManager.FixManager.CorruptedHex, null, true);
             }
 
             hexDocument = new FlowDocument();
@@ -476,16 +498,19 @@ namespace HexChanger
             else if ((!_globalManager.FixManager.FixedHex.IsEmpty) && _globalManager.FixManager.CorruptedHex.IsEmpty)
             {
                 InsertHexToBlock(FixedText, _globalManager.FixManager.FixedHex);
+                InsertHexToBlock(FixedAscii, _globalManager.FixManager.FixedHex, null, true);
             }
 
             if (!_globalManager.FixManager.CorruptedHex.IsEmpty && !_globalManager.FixManager.FixedHex.IsEmpty)
             {
                 InsertHexToBlock(CorruptedText, _globalManager.FixManager.CorruptedHex, _globalManager.FixManager.FixedHex);
+                InsertHexToBlock(CorruptedAscii, _globalManager.FixManager.CorruptedHex, _globalManager.FixManager.FixedHex, true);
                 InsertHexToBlock(FixedText, _globalManager.FixManager.FixedHex, _globalManager.FixManager.CorruptedHex);
+                InsertHexToBlock(FixedAscii, _globalManager.FixManager.FixedHex, _globalManager.FixManager.CorruptedHex, true);
             }
         }
 
-        private void InsertHexToBlock(RichTextBox targetTextBlock, Hex hexToInsert, Hex comparableHex = null)
+        private void InsertHexToBlock(RichTextBox targetTextBlock, Hex hexToInsert, Hex comparableHex = null, bool ascii = false)
         {
             if (comparableHex == null)
             {
@@ -501,7 +526,6 @@ namespace HexChanger
             {
                 if (byteIndex != 0 && byteIndex % 16 == 0)
                 {
-                    //hexRun.Text += "\n";
                     hexBuilder.Append("\n");
                 }
 
@@ -522,7 +546,14 @@ namespace HexChanger
                     hexRun = new Run();
                     hexBuilder.Clear();
                 }
-                hexBuilder.Append(fixedByte.ToString("X2") + " ");
+                if (ascii)
+                {
+                    hexBuilder.Append(Encoding.ASCII.GetString(new byte[] { (byte)fixedByte }));
+                }
+                else
+                {
+                    hexBuilder.Append(fixedByte.ToString("X2") + " ");
+                }
                 byteIndex++;
             }
             hexRun.Text = hexBuilder.ToString();
