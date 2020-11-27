@@ -10,15 +10,13 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
-            <ColumnDefinition Width="2*" />
-            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="4*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="1*" />
         </Grid.RowDefinitions>
-        <Menu HorizontalAlignment="Stretch" Height="auto" VerticalAlignment="Top" Grid.ColumnSpan="3">
+        <Menu HorizontalAlignment="Stretch" Height="auto" VerticalAlignment="Top" Grid.ColumnSpan="2">
             <MenuItem Header="Ustawienia">
                 <MenuItem Header="Ustaw katalog instrukcji" Click="SelectInstrucionsCatalog" />
                 <CheckBox Name="RepairAfterSelectionSwitch" Content="Naprawiaj po wybraniu instrukcji" Click="ChangeRepairAfterSelection"></CheckBox>
@@ -31,17 +29,36 @@
             <CheckBox Content="Zsynchronizuj przewijanie" Name="SynchScrolls" />
             <MenuItem Name="OpenPdfSelector" Header="Otwórz PDF"/>
         </Menu>
-        <TreeView Name="InstructionsTree" Grid.Row="1" Grid.Column="0" Grid.RowSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
+        <TreeView Name="InstructionsTree" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
         </TreeView>
+        <Grid Grid.Row="1" Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="1*" />
+            </Grid.RowDefinitions>
 
-        <Label Name="IdentifiedLabel" Grid.Row="1" Grid.Column="1" Content=""></Label>
-        <Label Name="SomethingFoundLabel" Grid.Row="1" Grid.Column="2" Content=""></Label>
+            <Label Name="IdentifiedLabel" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Content=""></Label>
+            <Label Name="SomethingFoundLabel" Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2" Content=""></Label>
 
-        <ScrollViewer HorizontalScrollBarVisibility="Visible" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,30,0,0" ScrollChanged="ScrollChanged" Name="CorruptedScroll">
-            <RichTextBox Name="CorruptedText" MinWidth="360" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" FontFamily="Courier New" IsReadOnly="True"/>
-        </ScrollViewer>
-        <ScrollViewer HorizontalScrollBarVisibility="Visible" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,30,10,0" ScrollChanged="ScrollChanged" Name="FixedScroll">
-            <RichTextBox Name="FixedText" MinWidth="360" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" FontFamily="Courier New" IsReadOnly="True"/>
-        </ScrollViewer>
+            <ScrollViewer HorizontalScrollBarVisibility="Visible" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Top" ScrollChanged="ScrollChanged" Name="CorruptedScroll">
+                <RichTextBox Name="CorruptedText" MinWidth="360" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" FontFamily="Courier New" IsReadOnly="True"/>
+            </ScrollViewer>
+            <ScrollViewer HorizontalScrollBarVisibility="Visible" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Top" Name="CorruptedScrollAscii">
+                <RichTextBox Name="CorruptedAscii" MinWidth="360" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" FontFamily="Courier New" IsReadOnly="True"/>
+            </ScrollViewer>
+
+            <ScrollViewer HorizontalScrollBarVisibility="Visible" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Top" ScrollChanged="ScrollChanged" Name="FixedScroll">
+                <RichTextBox Name="FixedText" MinWidth="360" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" FontFamily="Courier New" IsReadOnly="True"/>
+            </ScrollViewer>
+            <ScrollViewer HorizontalScrollBarVisibility="Visible" Grid.Row="1" Grid.Column="3" HorizontalAlignment="Stretch" VerticalAlignment="Top" Name="FixedScrollAscii">
+                <RichTextBox Name="FixedAscii" MinWidth="360" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" FontFamily="Courier New" IsReadOnly="True"/>
+            </ScrollViewer>
+        </Grid>
     </Grid>
 </Window>
