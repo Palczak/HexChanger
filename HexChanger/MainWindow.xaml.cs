@@ -455,7 +455,7 @@ namespace HexChanger
                     FixedScroll.ScrollToVerticalOffset(e.VerticalOffset);
                     FixedScroll.ScrollToHorizontalOffset(e.HorizontalOffset);
                     FixedScrollAscii.ScrollToVerticalOffset(e.VerticalOffset);
-                    if(sender == CorruptedScrollAscii)
+                    if (sender == CorruptedScrollAscii)
                     {
                         CorruptedScroll.ScrollToVerticalOffset(e.VerticalOffset);
                     }
@@ -548,7 +548,11 @@ namespace HexChanger
                 }
                 if (ascii)
                 {
-                    hexBuilder.Append(Encoding.ASCII.GetString(new byte[] { (byte)fixedByte }));
+                    string asciiResult = Encoding.UTF8.GetString(new byte[] { (byte)fixedByte });
+                    //Console.WriteLine(asciiResult + "  " + fixedByte);
+                    if (fixedByte < 32 || fixedByte > 126)
+                        asciiResult = " ";
+                    hexBuilder.Append(asciiResult);
                 }
                 else
                 {
