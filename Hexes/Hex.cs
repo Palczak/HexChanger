@@ -9,6 +9,18 @@ namespace Hexes
 
         public Hex(IEnumerable<int> collection) : base(collection) { }
 
+        public Hex(string text)
+        {
+            text = text.Replace(" ", "");
+            text = text.Replace("\n", "");
+            for (int i = 0; i < text.Length - 2; i += 2)
+            {
+                string hex = text.Substring(i, 2);
+                int intValue = int.Parse(hex, System.Globalization.NumberStyles.HexNumber);
+                Add(intValue);
+            }
+        }
+
         public bool IsEmpty { get { return Count == 0; } }
 
         public List<int> AllMatches(Hex hex)

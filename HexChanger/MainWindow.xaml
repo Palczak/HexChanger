@@ -54,7 +54,7 @@
             </ScrollViewer>
 
             <ScrollViewer HorizontalScrollBarVisibility="Visible" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Top" ScrollChanged="ScrollChanged" Name="FixedScroll">
-                <RichTextBox Name="FixedText" MinWidth="360" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" FontFamily="Courier New" IsReadOnly="True"/>
+                <RichTextBox Name="FixedText" MinWidth="360" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" FontFamily="Courier New" TextChanged="FixedText_TextChanged"/>
             </ScrollViewer>
             <ScrollViewer HorizontalScrollBarVisibility="Visible" Grid.Row="1" Grid.Column="3" HorizontalAlignment="Stretch" VerticalAlignment="Top" ScrollChanged="ScrollChanged" Name="FixedScrollAscii">
                 <RichTextBox Name="FixedAscii" MinWidth="200" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" FontFamily="Courier New" IsReadOnly="True"/>

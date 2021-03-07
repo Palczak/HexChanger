@@ -3,6 +3,7 @@ using Hexes;
 using Managers;
 using Microsoft.Win32;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -18,8 +19,9 @@ namespace HexChanger
     /// </summary>
     public partial class MainWindow : Window
     {
-        private GlobalManager _globalManager;
+        private readonly GlobalManager _globalManager;
         private string _selectedInstructionPath;
+        private bool _fixedEdited = false;
 
         private enum Label_state
         {
@@ -195,14 +197,16 @@ namespace HexChanger
                         }
                     }
                 }
-                catch (Exception ex) { }
+                catch (Exception) { }
             }
         }
 
         private TreeViewItemInstruction CreateInstructionTreeNode(string directoryPath)
         {
-            TreeViewItemInstruction newNode = new TreeViewItemInstruction();
-            newNode.FullPath = directoryPath;
+            TreeViewItemInstruction newNode = new TreeViewItemInstruction
+            {
+                FullPath = directoryPath
+            };
             if (Path.GetFileName(directoryPath).Trim() == "")
                 newNode.Header = directoryPath;
             else
@@ -426,7 +430,17 @@ namespace HexChanger
                     Nullable<bool> result = saveFileDialog.ShowDialog();
                     if (saveFileDialog.FileName != "")
                     {
-                        _globalManager.FileManager.HexIO.WriteHex(saveFileDialog.FileName, _globalManager.FixManager.FixedHex);
+                        if (_fixedEdited)
+                        {
+                            var rtb = FixedText;
+                            var textRange = new TextRange(rtb.Document.ContentStart, rtb.Document.ContentEnd).Text;
+                            Debug.WriteLine(new Hex(textRange));
+                            _globalManager.FileManager.HexIO.WriteHex(saveFileDialog.FileName, new Hex(textRange));
+                        }
+                        else
+                        {
+                            _globalManager.FileManager.HexIO.WriteHex(saveFileDialog.FileName, _globalManager.FixManager.FixedHex);
+                        }
                     }
                 }
             }
@@ -476,6 +490,7 @@ namespace HexChanger
 
         private void PrintHexes()
         {
+            _fixedEdited = false;
             FlowDocument hexDocument;
             hexDocument = new FlowDocument();
             if (_globalManager.FixManager.CorruptedHex.IsEmpty)
@@ -534,8 +549,10 @@ namespace HexChanger
                     isDifferend = true;
                     hexRun.Text = hexBuilder.ToString();
                     hexParagraph.Inlines.Add(hexRun);
-                    hexRun = new Run();
-                    hexRun.Background = Brushes.Orange;
+                    hexRun = new Run
+                    {
+                        Background = Brushes.Orange
+                    };
                     hexBuilder.Clear();
                 }
                 else if (fixedByte == comparableHex[byteIndex] && isDifferend)
@@ -590,6 +607,11 @@ namespace HexChanger
         private void RunPdf(object sender, RoutedEventArgs e)
         {
             System.Diagnostics.Process.Start((string)((MenuItem)sender).Header);
+        }
+
+        private void FixedText_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            _fixedEdited = true;
         }
     }
 }
